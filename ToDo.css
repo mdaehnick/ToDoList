@@ -12,7 +12,7 @@ div#wrapper
   border:1px solid black;
   width:50%;
   background-color:white;
-   margin-left:auto;
+  margin-left:auto;
   margin-right:auto;
 }
 
@@ -26,9 +26,12 @@ div#todolist
 {
 border:1px solid black;
   height:20px;
-  
 }
 
+.template
+{
+  display:none;
+}
 .checkBoxAll
 {
   height:20px;
@@ -85,11 +88,9 @@ border:1px solid black;
 }
 
 .tagLine {
-
     text-align:center; 
     color: grey;
     font-size: 3.2em;
-
 }
 
 li {
