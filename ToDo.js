@@ -14,7 +14,7 @@ $(function() {
 			localStorage.setItem('todos', JSON.stringify(a));
 		}
 
-		// setListners after the list has been built.  Populate list:
+		// setListeners after the list has been built.  Populate list:
 		populateList();
 	    setListeners();
 	}
@@ -31,40 +31,58 @@ $(function() {
      function checkKeyPress(e) {
 		if (e.keyCode == 13) {
  //           console.log($('#new-todo').val());
-			insertEntry();
+			saveEntry();
 		} else if (e.keyCode == 27) {
 			console.log('esc pressed== abort editing');
+		}
+	  }
+ //  Add a listener for end of editing in edit field   
+     function checkEditPress(e) {
+		if(e.keyCode == 13) {
+			updateEntry();
+		} else if(e.keyCode == 27) {
+			abortEditing();
 		}
 	}
 
    	// build the entire list based on the contents of localStorage
 	function populateList() {
+		var allCompleted = true;
 		todos = JSON.parse(localStorage.getItem('todos'));
 		if(todos.length > 0) {
 			for (var i = 0; i <= todos.length -1 ; i++) {
 				insertEntry(todos[i]['name'],todos[i]['id'],todos[i]['completed']);
+				if(todos[i]['completed'] == false) {
+					allCompleted = false;
+				}
 			};
 		}
+
+		if(allCompleted == true) {
+			$('#toggle-all').prop('checked', true);
+		}
+
+		updateTodosLeft();
+
+
 	} 
 
+
 function insertEntry() {
-  var entry = $('#new-todo').val();
+    var entry = $('#new-todo').val();
+    var id = uuid();
   $('.template li').clone().appendTo('#todo-list');
   
 		$('#todo-list li:last-child label').text(entry);
 		$('#todo-list li:last-child').attr('data-id',id);
 		if(status) {
-		$('#todo-list li:last-child').addClass('completed');
-		$('#todo-list li:last-child .toggle').attr('checked', true)
+		  $('#todo-list li:last-child').addClass('completed');
+		  $('#todo-list li:last-child .toggle').attr('checked', true)
 		}
   // after inserting entry, reset the input box to original state:
 		$('#new-todo').val('');
-//		addListItemListener(id);    (references code to add new listener)                        
+		addListItemListener(id);    // (references code to add new listener)                        
  }
-
-	var ENTER_KEY = 13;
-	var ESCAPE_KEY = 27;
-
 	
     function uuid () {
 			/*jshint bitwise:false */
@@ -95,19 +113,20 @@ function insertEntry() {
 	}
 
     function saveEntry(entry) {
-          var ID = uuid();
+          var id = uuid();
           var todoEntry = {
-            'id':ID,
+            'id':id,
             'name':entry
           }
           console.log(todoEntry);
-         localStorage.setItem('Todos', JSON.stringify(todoEntry));
+          localStorage.setItem('todos', JSON.stringify(todoEntry));
                  
-		insertEntry(entry,id);             
+		insertEntry(entry,id);   
+        updateTodosLeft();
     }
-  
-  
-  function addListItemListener(id) {
+    
+//Add a listener for double clicks on a list item                                         
+    function addListItemListener(id) {
 		$("li[data-id *= '" + id + "']").dblclick(function(event) {			
 			// if dblclick was on a label and the parent isn't marked completed.
 			if(event.target.nodeName == "LABEL" && (!$(event.target).closest('li').hasClass('completed'))) {
@@ -131,6 +150,7 @@ function insertEntry() {
 					item.addClass('completed');
 					updateCompleted(id, true)
 				}
+                updateTodosLeft();
 			}
 		});
 	}
@@ -167,29 +187,23 @@ function insertEntry() {
 		$('.editing').removeClass('editing');
 		$('.edit').val('');
 	}
+    function updateTodosLeft() {
+		var left = 0;
+		if(todos.length > 0) {
+			for(i=0; i <  todos.length; i++) {
+				if(todos[i]['completed'] == false){
+					left++;
+				}
+			}
+		}
+
+		$('.todoCount').text(left);
+	}
   
-  
-    setListeners();
     standUp();                        
   });
   
   
   
-    
-    //Add listener for dblclick event for editing a list item
-    
-    // Add listener for clicking on a checkmark
-    
-    //add listener for clicking on the complete-all item
-    
-    // add listener for a click on the clear all completed link
-    
-    //  add listener for a click on the "X" to delete a single item
-    
-    // add listener for hovering over a list item that will show the "x"
-    
-    // add listener for a click on the show "all", Active. Completed links
-    
-    
 
   
